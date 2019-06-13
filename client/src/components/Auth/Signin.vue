@@ -13,7 +13,7 @@
         sm6
         offset-sm3
       >
-        <h1>Welcome Back!</h1>
+        <h1 class="primary--text">Welcome Back!</h1>
       </v-flex>
     </v-layout>
 

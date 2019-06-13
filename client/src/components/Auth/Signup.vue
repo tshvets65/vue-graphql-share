@@ -13,7 +13,7 @@
         sm6
         offset-sm3
       >
-        <h1>Get Started Here</h1>
+        <h1 class="primary--text">Get Started Here</h1>
       </v-flex>
     </v-layout>
 
