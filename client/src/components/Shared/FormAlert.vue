@@ -5,7 +5,7 @@
     dismissible
     transition='scale-transition'
   >
-    <h3>{{ message }}</h3>
+    <h3>{{ message.replace('GraphQL error:', '') }}</h3>
   </v-alert>
 </template>
 

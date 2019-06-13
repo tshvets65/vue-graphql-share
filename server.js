@@ -35,7 +35,11 @@ const server = new ApolloServer({
     const token = req.headers["authorization"];
     return { User, Post, currentUser: await getUser(token) };
   },
-  resolvers
+  resolvers,
+  formatError: error => ({
+    name: error.name,
+    message: error.message.replace("Context creation failed:", "")
+  })
 });
 
 server.listen().then(({ url }) => {
