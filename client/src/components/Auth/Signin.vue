@@ -83,7 +83,7 @@
                     color="accent"
                     type='submit'
                     :loading='loading'
-                    :disabled='!isFormValid'
+                    :disabled='!isFormValid || loading'
                   >
                     <span
                       slot='loader'
