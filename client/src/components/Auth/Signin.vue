@@ -18,6 +18,20 @@
     </v-layout>
 
     <v-layout
+      v-if='error'
+      row
+      wrap
+    >
+      <v-flex
+        xs12
+        sm6
+        offset-sm3
+      >
+        <form-alert :message="error.message"></form-alert>
+      </v-flex>
+    </v-layout>
+
+    <v-layout
       row
       wrap
     >
@@ -31,11 +45,17 @@
           dark
         >
           <v-container>
-            <v-form @submit.prevent="handleSigninUser">
+            <v-form
+              v-model='isFormValid'
+              lazy-validation
+              ref='form'
+              @submit.prevent="handleSigninUser"
+            >
               <v-layout row>
                 <v-flex xs12>
                   <v-text-field
                     v-model='username'
+                    :rules='usernameRules'
                     prepend-icon='face'
                     label='Username'
                     type='text'
@@ -48,6 +68,7 @@
                 <v-flex xs12>
                   <v-text-field
                     v-model='password'
+                    :rules='passwordRules'
                     prepend-icon='lock'
                     label='Password'
                     type='password'
@@ -61,7 +82,16 @@
                   <v-btn
                     color="accent"
                     type='submit'
-                  >Signin</v-btn>
+                    :loading='loading'
+                    :disabled='!isFormValid'
+                  >
+                    <span
+                      slot='loader'
+                      class="custom-loader"
+                    >
+                      <v-icon light>cached</v-icon>
+                    </span>
+                    Signin</v-btn>
                   <h3>New user?
                     <router-link to='/signup'>Signup</router-link>
                   </h3>
@@ -81,12 +111,23 @@ export default {
   name: "Signin",
   data() {
     return {
+      isFormValid: true,
       username: "",
-      password: ""
+      password: "",
+      usernameRules: [
+        username => !!username || "Username is required",
+        username =>
+          username.length < 10 || "Username must be less than 10 characters"
+      ],
+      passwordRules: [
+        password => !!password || "Password is required",
+        password =>
+          password.length >= 4 || "Password must be at least 4 characters"
+      ]
     };
   },
   computed: {
-    ...mapGetters(["user"])
+    ...mapGetters(["user", "error", "loading"])
   },
   watch: {
     user(value) {
@@ -97,11 +138,53 @@ export default {
   },
   methods: {
     handleSigninUser() {
-      this.$store.dispatch("signinUser", {
-        username: this.username,
-        password: this.password
-      });
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch("signinUser", {
+          username: this.username,
+          password: this.password
+        });
+      }
     }
   }
 };
 </script>
+
+<style>
+.custom-loader {
+  animation: loader 1s infinite;
+  display: flex;
+}
+@-moz-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
+
