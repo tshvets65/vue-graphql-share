@@ -35,6 +35,31 @@ export const ADD_POST = gql`
   }
 `;
 
+export const INFINITE_SCROLL_POSTS = gql`
+  query($pageNum: Int!, $pageSize: Int!) {
+    infiniteScrollPosts(pageNum: $pageNum, pageSize: $pageSize) {
+      hasMore
+      posts {
+        _id
+        title
+        imageUrl
+        categories
+        description
+        likes
+        createdAt
+        messages {
+          _id
+        }
+        createdBy {
+          _id
+          username
+          avatar
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CURRENT_USER = gql`
   query {
     getCurrentUser {

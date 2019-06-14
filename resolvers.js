@@ -24,6 +24,31 @@ module.exports = {
         .sort({ createdAt: "desc" })
         .populate({ path: "createdBy", model: "User" });
       return posts;
+    },
+    infiniteScrollPosts: async (_, { pageNum, pageSize }, { Post }) => {
+      let posts;
+      if (pageNum === 1) {
+        posts = await Post.find({})
+          .sort({ createdAt: "desc" })
+          .populate({
+            path: "createdBy",
+            model: "User"
+          })
+          .limit(pageSize);
+      } else {
+        const skip = pageSize * (pageNum - 1);
+        posts = await Post.find({})
+          .sort({ createdAt: "desc" })
+          .populate({
+            path: "createdBy",
+            model: "User"
+          })
+          .skip(skip)
+          .limit(pageSize);
+      }
+      const totalDocs = await Post.countDocuments();
+      const hasMore = totalDocs > pageSize * pageNum;
+      return { posts, hasMore };
     }
   },
   Mutation: {
