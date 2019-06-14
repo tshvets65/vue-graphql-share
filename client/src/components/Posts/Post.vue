@@ -71,14 +71,18 @@
         v-if='user'
       >
         <v-flex xs12>
-          <v-text-field
-            clearable
-            append-outer-icon='send'
-            label='Add Message'
-            type='text'
-            prepend-icon='email'
-            required
-          ></v-text-field>
+          <v-form @submit.prevent='handleAddPostMessage'>
+            <v-text-field
+              v-model='messageBody'
+              clearable
+              :append-outer-icon='messageBody && "send"'
+              @click:append-outer='handleAddPostMessage'
+              label='Add Message'
+              type='text'
+              prepend-icon='email'
+              required
+            ></v-text-field>
+          </v-form>
         </v-flex>
       </v-layout>
 
@@ -98,7 +102,7 @@
               <v-list-tile
                 avatar
                 inset
-                :key='message._id'
+                :key='message.avatar'
               >
                 <v-list-tile-avatar>
                   <img :src="message.messageUser.avatar" />
@@ -123,19 +127,17 @@
 </template>
 
 <script>
-import { GET_POST } from "../../queries";
 import { mapGetters } from "vuex";
+import { GET_POST, ADD_POST_MESSAGE } from "../../queries";
 
 export default {
   name: "Post",
   props: ["postId"],
   data() {
     return {
-      dialog: false
+      dialog: false,
+      messageBody: ""
     };
-  },
-  computed: {
-    ...mapGetters(["user"])
   },
   apollo: {
     getPost: {
@@ -147,7 +149,38 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(["user"])
+  },
   methods: {
+    handleAddPostMessage() {
+      const variables = {
+        messageBody: this.messageBody,
+        userId: this.user._id,
+        postId: this.postId
+      };
+      this.$apollo
+        .mutate({
+          mutation: ADD_POST_MESSAGE,
+          variables,
+          update: (cache, { data: { addPostMessage } }) => {
+            const data = cache.readQuery({
+              query: GET_POST,
+              variables: { postId: this.postId }
+            });
+            data.getPost.messages.unshift(addPostMessage);
+            cache.writeQuery({
+              query: GET_POST,
+              variables: { postId: this.postId },
+              data
+            });
+          }
+        })
+        .then(({ data }) => {
+          console.log(data.addPostMessage);
+        })
+        .catch(err => console.error(err));
+    },
     goToPreviousPage() {
       this.$router.go(-1);
     },
