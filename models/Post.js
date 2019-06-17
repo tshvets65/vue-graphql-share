@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Postchema = new mongoose.Schema(
+const PostSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -48,4 +48,9 @@ const Postchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", Postchema);
+//Create index to search on all fields
+PostSchema.index({
+  "$**": "text"
+});
+
+module.exports = mongoose.model("Post", PostSchema);

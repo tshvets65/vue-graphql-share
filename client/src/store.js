@@ -5,6 +5,7 @@ import router from "./router";
 import { defaultClient as apolloClient } from "./main";
 import {
   GET_POSTS,
+  SEARCH_POSTS,
   ADD_POST,
   SIGNIN_USER,
   GET_CURRENT_USER,
@@ -16,6 +17,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     posts: [],
+    searchResults: [],
     loading: false,
     user: null,
     error: null,
@@ -24,6 +26,11 @@ export default new Vuex.Store({
   mutations: {
     setPosts: (state, payload) => {
       state.posts = payload;
+    },
+    setSearchResult: (state, payload) => {
+      if (payload !== null) {
+        state.searchResults = payload;
+      }
     },
     setUser: (state, payload) => {
       state.user = payload;
@@ -38,7 +45,8 @@ export default new Vuex.Store({
       state.authError = payload;
     },
     clearError: state => (state.error = null),
-    clearUser: state => (state.user = null)
+    clearUser: state => (state.user = null),
+    clearSearchResults: state => (state.searchResults = [])
   },
   actions: {
     getCurrentUser: ({ commit }) => {
@@ -71,6 +79,17 @@ export default new Vuex.Store({
           console.error(err);
           commit("setLoading", false);
         });
+    },
+    searchPosts: ({ commit }, payload) => {
+      apolloClient
+        .query({
+          query: SEARCH_POSTS,
+          variables: payload
+        })
+        .then(({ data }) => {
+          commit("setSearchResult", data.searchPosts);
+        })
+        .catch(err => console.error(err));
     },
     addPost: ({ commit }, payload) => {
       commit("setLoading", true);
@@ -154,6 +173,7 @@ export default new Vuex.Store({
   },
   getters: {
     posts: state => state.posts,
+    searchResults: state => state.searchResults,
     user: state => state.user,
     loading: state => state.loading,
     error: state => state.error,
