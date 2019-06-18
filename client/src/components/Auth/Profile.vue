@@ -62,6 +62,7 @@
             <v-img
               height="30vh"
               :src='favorite.imageUrl'
+              @click='goToPost(favorite._id)'
             ></v-img>
             <v-card-text>{{favorite.title}}</v-card-text>
           </v-card>
@@ -127,6 +128,7 @@
             <v-img
               height='30vh'
               :src='post.imageUrl'
+              @click='goToPost(post._id)'
             ></v-img>
           </v-card>
         </v-flex>
@@ -305,6 +307,9 @@ export default {
           postId: this.postId
         });
       }
+    },
+    goToPost(id) {
+      this.$router.push(`/posts/${id}`);
     }
   }
 };

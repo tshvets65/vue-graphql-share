@@ -13,7 +13,12 @@ import FormAlert from "./components/Shared/FormAlert";
 
 Vue.filter("formatDate", function(value) {
   if (!value) return "";
-  return moment(Number(value)).format("MM/DD/YYYY hh:mm");
+  return moment(Number(value)).format("ll");
+});
+
+Vue.filter("timeFromNow", function(value) {
+  if (!value) return "";
+  return moment(Number(value)).fromNow();
 });
 
 Vue.component("form-alert", FormAlert);

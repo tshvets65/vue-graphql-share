@@ -12,7 +12,8 @@ import {
   GET_CURRENT_USER,
   SIGNUP_USER,
   UPDATE_USER_POST,
-  DELETE_USER_POST
+  DELETE_USER_POST,
+  INFINITE_SCROLL_POSTS
 } from "./queries";
 
 Vue.use(Vuex);
@@ -131,7 +132,16 @@ export default new Vuex.Store({
               _id: -1,
               ...payload
             }
-          }
+          },
+          refetchQueries: [
+            {
+              query: INFINITE_SCROLL_POSTS,
+              variables: {
+                pageNum: 1,
+                pageSize
+              }
+            }
+          ]
         })
         .then(({ data }) => {
           commit("setLoading", false);
