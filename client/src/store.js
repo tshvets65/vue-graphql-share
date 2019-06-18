@@ -6,10 +6,12 @@ import { defaultClient as apolloClient } from "./main";
 import {
   GET_POSTS,
   SEARCH_POSTS,
+  GET_USER_POST,
   ADD_POST,
   SIGNIN_USER,
   GET_CURRENT_USER,
-  SIGNUP_USER
+  SIGNUP_USER,
+  UPDATE_USER_POST
 } from "./queries";
 
 Vue.use(Vuex);
@@ -18,6 +20,7 @@ export default new Vuex.Store({
   state: {
     posts: [],
     searchResults: [],
+    userPosts: [],
     loading: false,
     user: null,
     error: null,
@@ -31,6 +34,9 @@ export default new Vuex.Store({
       if (payload !== null) {
         state.searchResults = payload;
       }
+    },
+    setUserPosts: (state, payload) => {
+      state.userPosts = payload;
     },
     setUser: (state, payload) => {
       state.user = payload;
@@ -80,6 +86,17 @@ export default new Vuex.Store({
           commit("setLoading", false);
         });
     },
+    getUserPosts: ({ commit }, payload) => {
+      apolloClient
+        .query({
+          query: GET_USER_POST,
+          variables: payload
+        })
+        .then(({ data }) => {
+          commit("setUserPosts", data.getUserPosts);
+        })
+        .catch(err => console.error(err));
+    },
     searchPosts: ({ commit }, payload) => {
       apolloClient
         .query({
@@ -123,6 +140,25 @@ export default new Vuex.Store({
           commit("setLoading", false);
           console.error(err);
         });
+    },
+    updateUserPost: ({ state, commit }, payload) => {
+      apolloClient
+        .mutate({
+          mutation: UPDATE_USER_POST,
+          variables: payload
+        })
+        .then(({ data }) => {
+          const index = state.userPosts.findIndex(
+            post => post._id === data.updateUserPost._id
+          );
+          const userPosts = [
+            ...state.userPosts.slice(0, index),
+            data.updateUserPost,
+            ...state.userPosts.slice(index + 1)
+          ];
+          commit("setUserPosts", userPosts);
+        })
+        .catch(err => console.error(err));
     },
     signinUser: ({ commit }, payload) => {
       commit("setLoading", true);
@@ -178,6 +214,7 @@ export default new Vuex.Store({
     loading: state => state.loading,
     error: state => state.error,
     authError: state => state.authError,
-    userFavorites: state => state.user && state.user.favorites
+    userFavorites: state => state.user && state.user.favorites,
+    userPosts: state => state.userPosts
   }
 });
