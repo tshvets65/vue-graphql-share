@@ -17,7 +17,7 @@
           <v-card-title primary-title>
             <div>
               <div class="headline">{{user.username}}</div>
-              <div>Joined {{user.createdAt}}</div>
+              <div>Joined {{user.createdAt | formatDate}}</div>
               <div class="hidden-xs-only font-weight-thin">{{user.favorites.length}} Favorites</div>
               <div class="hidden-xs-only font-weight-thin">2 Posts Added</div>
             </div>

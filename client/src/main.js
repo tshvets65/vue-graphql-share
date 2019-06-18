@@ -7,8 +7,14 @@ import store from "./store";
 
 import ApolloClient from "apollo-boost";
 import VueApollo from "vue-apollo";
+import moment from "moment";
 
 import FormAlert from "./components/Shared/FormAlert";
+
+Vue.filter("formatDate", function(value) {
+  if (!value) return "";
+  return moment(Number(value)).format("MM/DD/YYYY hh:mm");
+});
 
 Vue.component("form-alert", FormAlert);
 
